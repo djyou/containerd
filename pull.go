@@ -78,11 +78,11 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 		return nil, err
 	}
 
-	log.Println("obainted image from fetch")
+	log.Println("------------------------obainted image from fetch")
 	log.Println("name: " + img.Name)
 	log.Println("created at: ", img.CreatedAt)
 	log.Println("updated at: ", img.UpdatedAt)
-	log.Println("printing target")
+	log.Println("--------------------printing target")
 	log.Println("media type: ", img.Target.MediaType)
 	log.Println("platform: ", img.Target.Platform)
 	log.Println("digest: ", img.Target.Digest)
