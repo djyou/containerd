@@ -18,6 +18,7 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -153,10 +154,14 @@ func NewResolver(options ResolverOptions) remotes.Resolver {
 var _ remotes.Resolver = &dockerResolver{}
 
 func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocispec.Descriptor, error) {
+	fmt.Println("inside Reolve")
 	refspec, err := reference.Parse(ref)
 	if err != nil {
 		return "", ocispec.Descriptor{}, err
 	}
+
+	fmt.Println("hostname: " + refspec.Hostname())
+	fmt.Println("digest 1: " + refspec.Digest())
 
 	if refspec.Object == "" {
 		return "", ocispec.Descriptor{}, reference.ErrObjectRequired
@@ -176,6 +181,8 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 		dgst = refspec.Digest()
 	)
 
+	fmt.Println("digest 2: " + dgst)
+
 	if dgst != "" {
 		if err := dgst.Validate(); err != nil {
 			// need to fail here, since we can't actually resolve the invalid
@@ -190,6 +197,10 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 		urls = append(urls, fetcher.url("blobs", dgst.String()))
 	} else {
 		urls = append(urls, fetcher.url("manifests", refspec.Object))
+	}
+
+	for _, v := range urls {
+		fmt.Println("URL: " + v)
 	}
 
 	ctx, err = contextWithRepositoryScope(ctx, refspec, false)

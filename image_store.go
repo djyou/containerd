@@ -18,6 +18,7 @@ package containerd
 
 import (
 	"context"
+	"log"
 
 	imagesapi "github.com/containerd/containerd/api/services/images/v1"
 	"github.com/containerd/containerd/api/types"
@@ -61,12 +62,18 @@ func (s *remoteImages) List(ctx context.Context, filters ...string) ([]images.Im
 }
 
 func (s *remoteImages) Create(ctx context.Context, image images.Image) (images.Image, error) {
+	log.Println("----------------------------------------inside image store Create")
+	// make a grpc request
 	created, err := s.client.Create(ctx, &imagesapi.CreateImageRequest{
 		Image: imageToProto(&image),
 	})
 	if err != nil {
+		log.Println("error?")
 		return images.Image{}, errdefs.FromGRPC(err)
 	}
+
+	log.Println("print created.Image.Name")
+	log.Println(created.Image.Name)
 
 	return imageFromProto(&created.Image), nil
 }

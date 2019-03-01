@@ -18,6 +18,8 @@ package containerd
 
 import (
 	"context"
+	"log"
+	"runtime"
 
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
@@ -39,12 +41,22 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 			return nil, err
 		}
 	}
+	log.Println("os: " + runtime.GOOS)
+	log.Println("arch: " + runtime.GOARCH)
+
+	log.Println("-----------------------------------Pull 1")
+	log.Println("pullCtx.PlatformMatcher")
+	log.Println(pullCtx.PlatformMatcher)
+	log.Println("len(pullCtx.Platforms)")
+	log.Println(len(pullCtx.Platforms))
 
 	if pullCtx.PlatformMatcher == nil {
 		if len(pullCtx.Platforms) > 1 {
 			return nil, errors.New("cannot pull multiplatform image locally, try Fetch")
 		} else if len(pullCtx.Platforms) == 0 {
 			pullCtx.PlatformMatcher = platforms.Default()
+			log.Println("pullCtx.PlatformMatcher 2")
+			log.Println(pullCtx.PlatformMatcher)
 		} else {
 			p, err := platforms.Parse(pullCtx.Platforms[0])
 			if err != nil {
@@ -79,7 +91,13 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 
 func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, limit int) (images.Image, error) {
 	store := c.ContentStore()
+	// Resolve makes are remote request (get manifest by tag/sha) to get the descriptor
 	name, desc, err := rCtx.Resolver.Resolve(ctx, ref)
+
+	log.Println("-----------------------------------fetch 1")
+	log.Println("name: " + name)
+	log.Println("desc digest: " + desc.Digest)
+
 	if err != nil {
 		return images.Image{}, errors.Wrapf(err, "failed to resolve reference %q", ref)
 	}
@@ -97,6 +115,8 @@ func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, lim
 		limiter       *semaphore.Weighted
 	)
 
+	log.Println("desc media type: " + desc.MediaType)
+	// Legacy Docker schema1 manifest
 	if desc.MediaType == images.MediaTypeDockerSchema1Manifest && rCtx.ConvertSchema1 {
 		schema1Converter := schema1.NewConverter(store, fetcher)
 
@@ -182,9 +202,11 @@ func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, lim
 	for {
 		if created, err := is.Create(ctx, img); err != nil {
 			if !errdefs.IsAlreadyExists(err) {
+				log.Println("error NOT due to already exists")
 				return images.Image{}, err
 			}
 
+			log.Println("error IS due to already exists")
 			updated, err := is.Update(ctx, img)
 			if err != nil {
 				// if image was removed, try create again
