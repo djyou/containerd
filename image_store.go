@@ -68,7 +68,7 @@ func (s *remoteImages) Create(ctx context.Context, image images.Image) (images.I
 		Image: imageToProto(&image),
 	})
 	if err != nil {
-		log.Println("error?")
+		// It's also an error if the image already exists
 		return images.Image{}, errdefs.FromGRPC(err)
 	}
 

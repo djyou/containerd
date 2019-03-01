@@ -19,6 +19,7 @@ package containerd
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/containerd/containerd/content"
 	"github.com/containerd/containerd/errdefs"
@@ -128,12 +129,16 @@ func (i *image) IsUnpacked(ctx context.Context, snapshotterName string) (bool, e
 }
 
 func (i *image) Unpack(ctx context.Context, snapshotterName string) error {
+	log.Println("---------------------------------Unpack")
+	log.Println("snapshotterName: ", snapshotterName)
+
 	ctx, done, err := i.client.WithLease(ctx)
 	if err != nil {
 		return err
 	}
 	defer done(ctx)
 
+	log.Println("platform: ", i.platform)
 	layers, err := i.getLayers(ctx, i.platform)
 	if err != nil {
 		return err

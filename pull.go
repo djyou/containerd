@@ -78,6 +78,19 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 		return nil, err
 	}
 
+	log.Println("obainted image from fetch")
+	log.Println("name: " + img.Name)
+	log.Println("created at: ", img.CreatedAt)
+	log.Println("updated at: ", img.UpdatedAt)
+	log.Println("printing target")
+	log.Println("media type: ", img.Target.MediaType)
+	log.Println("platform: ", img.Target.Platform)
+	log.Println("digest: ", img.Target.Digest)
+	log.Println("size: ", img.Target.Size)
+	log.Println("annotations: ", img.Target.Annotations)
+	log.Println("urls: ", img.Target.URLs)
+
+	// Just a new wrapper on the image
 	i := NewImageWithPlatform(c, img, pullCtx.PlatformMatcher)
 
 	if pullCtx.Unpack {
