@@ -82,7 +82,7 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 	log.Println("name: " + img.Name)
 	log.Println("created at: ", img.CreatedAt)
 	log.Println("updated at: ", img.UpdatedAt)
-	log.Println("--------------------printing target")
+	log.Println("--------------------printing image Target")
 	log.Println("media type: ", img.Target.MediaType)
 	log.Println("platform: ", img.Target.Platform)
 	log.Println("digest: ", img.Target.Digest)
@@ -90,7 +90,8 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 	log.Println("annotations: ", img.Target.Annotations)
 	log.Println("urls: ", img.Target.URLs)
 
-	// Just a new wrapper on the image
+	// i is just a containerd image wrapper on the images.Image
+	// with platform and the containerd client
 	i := NewImageWithPlatform(c, img, pullCtx.PlatformMatcher)
 
 	if pullCtx.Unpack {

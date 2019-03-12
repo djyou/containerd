@@ -196,6 +196,9 @@ func (i *image) Unpack(ctx context.Context, snapshotterName string) error {
 func (i *image) getLayers(ctx context.Context, platform platforms.MatchComparer) ([]rootfs.Layer, error) {
 	cs := i.client.ContentStore()
 
+	// i.i.Target is the descriptor for the manifest
+	// Get the manifest for the specified platform
+	// If the descriptor is not a manifest list, return whatever it is
 	manifest, err := images.Manifest(ctx, cs, i.i.Target, platform)
 	if err != nil {
 		return nil, err
