@@ -24,6 +24,7 @@ import (
 	"github.com/containerd/containerd/content"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
+	"github.com/containerd/containerd/logger"
 	"github.com/containerd/containerd/platforms"
 	"github.com/containerd/containerd/rootfs"
 	digest "github.com/opencontainers/go-digest"
@@ -152,7 +153,15 @@ func (i *image) Unpack(ctx context.Context, snapshotterName string) error {
 		chain    []digest.Digest
 		unpacked bool
 	)
+
+	count := 1
 	for _, layer := range layers {
+		log.Printf("------------------------------Layer %d\n", count)
+		count++
+		// layer.Blob is the compressed layer read from manifest
+		// layer.Diff is the uncompressed layer read from config blob
+		// the digest is from config.rootfs.diff_ids list, which is the same order in manifest
+		logger.Println(layer)
 		unpacked, err = rootfs.ApplyLayer(ctx, layer, chain, sn, a)
 		if err != nil {
 			return err
@@ -164,23 +173,32 @@ func (i *image) Unpack(ctx context.Context, snapshotterName string) error {
 			cinfo := content.Info{
 				Digest: layer.Blob.Digest,
 				Labels: map[string]string{
+					// How is layer.Diff.Digest computed?
 					"containerd.io/uncompressed": layer.Diff.Digest.String(),
 				},
 			}
+			log.Println("----------cinfo")
+			logger.Println(cinfo)
+			// Why applying labels?
 			if _, err := cs.Update(ctx, cinfo, "labels.containerd.io/uncompressed"); err != nil {
 				return err
 			}
 		}
 
 		chain = append(chain, layer.Diff.Digest)
+		log.Println("")
 	}
 
 	desc, err := i.i.Config(ctx, cs, i.platform)
+	log.Println("-----------desc")
+	logger.Println(desc)
 	if err != nil {
 		return err
 	}
 
 	rootfs := identity.ChainID(chain).String()
+	log.Println("-----------rootfs")
+	logger.Println(rootfs)
 
 	cinfo := content.Info{
 		Digest: desc.Digest,
@@ -188,6 +206,9 @@ func (i *image) Unpack(ctx context.Context, snapshotterName string) error {
 			fmt.Sprintf("containerd.io/gc.ref.snapshot.%s", snapshotterName): rootfs,
 		},
 	}
+	// What's this cinfo?
+	log.Println("-----------cinfo 2")
+	logger.Println(cinfo)
 
 	_, err = cs.Update(ctx, cinfo, fmt.Sprintf("labels.containerd.io/gc.ref.snapshot.%s", snapshotterName))
 	return err

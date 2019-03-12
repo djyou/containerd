@@ -23,6 +23,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/containerd/containerd/logger"
+
 	"github.com/containerd/containerd/diff"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/log"
@@ -80,11 +82,14 @@ func ApplyLayer(ctx context.Context, layer Layer, chain []digest.Digest, sn snap
 		applied bool
 	)
 	if _, err := sn.Stat(ctx, chainID); err != nil {
+		// Try to get info for the snapshot
 		if !errdefs.IsNotFound(err) {
 			return false, errors.Wrapf(err, "failed to stat snapshot %s", chainID)
 		}
 
+		// If not found, try apply layers
 		if err := applyLayers(ctx, []Layer{layer}, append(chain, layer.Diff.Digest), sn, a, opts...); err != nil {
+			// Concurrency?
 			if !errdefs.IsAlreadyExists(err) {
 				return false, err
 			}
@@ -106,11 +111,16 @@ func applyLayers(ctx context.Context, layers []Layer, chain []digest.Digest, sn 
 		err     error
 	)
 
+	fmt.Println("------------------------------- applyLayers")
+	count := 1
 	for {
 		key = fmt.Sprintf("extract-%s %s", uniquePart(), chainID)
 
 		// Prepare snapshot with from parent, label as root
 		mounts, err = sn.Prepare(ctx, key, parent.String(), opts...)
+		fmt.Printf("------------------ Mount %d\n", count)
+		count++
+		logger.Println(mounts)
 		if err != nil {
 			if errdefs.IsNotFound(err) && len(layers) > 1 {
 				if err := applyLayers(ctx, layers[:len(layers)-1], chain[:len(chain)-1], sn, a); err != nil {

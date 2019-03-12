@@ -21,6 +21,8 @@ import (
 	"log"
 	"runtime"
 
+	"github.com/containerd/containerd/logger"
+
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/platforms"
@@ -79,16 +81,7 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 	}
 
 	log.Println("------------------------obainted image from fetch")
-	log.Println("name: " + img.Name)
-	log.Println("created at: ", img.CreatedAt)
-	log.Println("updated at: ", img.UpdatedAt)
-	log.Println("--------------------printing image Target")
-	log.Println("media type: ", img.Target.MediaType)
-	log.Println("platform: ", img.Target.Platform)
-	log.Println("digest: ", img.Target.Digest)
-	log.Println("size: ", img.Target.Size)
-	log.Println("annotations: ", img.Target.Annotations)
-	log.Println("urls: ", img.Target.URLs)
+	logger.Println(img)
 
 	// i is just a containerd image wrapper on the images.Image
 	// with platform and the containerd client

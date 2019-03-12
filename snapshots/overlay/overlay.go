@@ -114,6 +114,7 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
 //
 // Should be used for parent resolution, existence checks and to discern
 // the kind of snapshot.
+// Default snapshotter
 func (o *snapshotter) Stat(ctx context.Context, key string) (snapshots.Info, error) {
 	ctx, t, err := o.ms.TransactionContext(ctx, false)
 	if err != nil {
@@ -373,6 +374,7 @@ func (o *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
 		}
 	}()
 
+	fmt.Println("----------------------------------- createSnapshot")
 	snapshotDir := filepath.Join(o.root, "snapshots")
 	td, err = o.prepareDirectory(ctx, snapshotDir, kind)
 	if err != nil {
