@@ -278,6 +278,7 @@ func NewDiffClient(cc *grpc.ClientConn) DiffClient {
 }
 
 func (c *diffClient) Apply(ctx context.Context, in *ApplyRequest, opts ...grpc.CallOption) (*ApplyResponse, error) {
+	//
 	out := new(ApplyResponse)
 	err := c.cc.Invoke(ctx, "/containerd.services.diff.v1.Diff/Apply", in, out, opts...)
 	if err != nil {

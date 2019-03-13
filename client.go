@@ -21,12 +21,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/containerd/containerd/logger"
 
 	containersapi "github.com/containerd/containerd/api/services/containers/v1"
 	contentapi "github.com/containerd/containerd/api/services/content/v1"
@@ -543,6 +546,8 @@ func (c *Client) ContentStore() content.Store {
 
 // SnapshotService returns the underlying snapshotter for the provided snapshotter name
 func (c *Client) SnapshotService(snapshotterName string) snapshots.Snapshotter {
+	log.Println("printing snapshotters")
+	logger.Println(c.snapshotters)
 	if c.snapshotters != nil {
 		return c.snapshotters[snapshotterName]
 	}

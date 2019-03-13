@@ -18,6 +18,7 @@ package native
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -76,6 +77,7 @@ func NewSnapshotter(root string) (snapshots.Snapshotter, error) {
 // Should be used for parent resolution, existence checks and to discern
 // the kind of snapshot.
 func (o *snapshotter) Stat(ctx context.Context, key string) (snapshots.Info, error) {
+	fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ native")
 	ctx, t, err := o.ms.TransactionContext(ctx, false)
 	if err != nil {
 		return snapshots.Info{}, err

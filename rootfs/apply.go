@@ -122,6 +122,7 @@ func applyLayers(ctx context.Context, layers []Layer, chain []digest.Digest, sn 
 		count++
 		logger.Println(mounts)
 		if err != nil {
+			// What does this recursion do?
 			if errdefs.IsNotFound(err) && len(layers) > 1 {
 				if err := applyLayers(ctx, layers[:len(layers)-1], chain[:len(chain)-1], sn, a); err != nil {
 					if !errdefs.IsAlreadyExists(err) {
@@ -154,6 +155,7 @@ func applyLayers(ctx context.Context, layers []Layer, chain []digest.Digest, sn 
 		}
 	}()
 
+	// Apply is a grpc request
 	diff, err = a.Apply(ctx, layer.Blob, mounts)
 	if err != nil {
 		err = errors.Wrapf(err, "failed to extract layer %s", layer.Diff.Digest)

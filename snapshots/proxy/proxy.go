@@ -18,6 +18,7 @@ package proxy
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	snapshotsapi "github.com/containerd/containerd/api/services/snapshots/v1"
@@ -43,6 +44,7 @@ type proxySnapshotter struct {
 }
 
 func (p *proxySnapshotter) Stat(ctx context.Context, key string) (snapshots.Info, error) {
+	fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ proxy")
 	resp, err := p.client.Stat(ctx,
 		&snapshotsapi.StatSnapshotRequest{
 			Snapshotter: p.snapshotterName,

@@ -173,7 +173,7 @@ func (i *image) Unpack(ctx context.Context, snapshotterName string) error {
 			cinfo := content.Info{
 				Digest: layer.Blob.Digest,
 				Labels: map[string]string{
-					// How is layer.Diff.Digest computed?
+					// layer.Diff.Digest is from the config blob
 					"containerd.io/uncompressed": layer.Diff.Digest.String(),
 				},
 			}

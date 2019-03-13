@@ -112,6 +112,7 @@ func NewSnapshotter(root string) (snapshots.Snapshotter, error) {
 // Should be used for parent resolution, existence checks and to discern
 // the kind of snapshot.
 func (b *snapshotter) Stat(ctx context.Context, key string) (snapshots.Info, error) {
+	fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ btrfs")
 	ctx, t, err := b.ms.TransactionContext(ctx, false)
 	if err != nil {
 		return snapshots.Info{}, err

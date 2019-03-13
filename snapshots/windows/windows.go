@@ -21,6 +21,7 @@ package windows
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -93,6 +94,7 @@ func NewSnapshotter(root string) (snapshots.Snapshotter, error) {
 // Should be used for parent resolution, existence checks and to discern
 // the kind of snapshot.
 func (s *snapshotter) Stat(ctx context.Context, key string) (snapshots.Info, error) {
+	fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ windows")
 	ctx, t, err := s.ms.TransactionContext(ctx, false)
 	if err != nil {
 		return snapshots.Info{}, err

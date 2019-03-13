@@ -116,6 +116,7 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
 // the kind of snapshot.
 // Default snapshotter
 func (o *snapshotter) Stat(ctx context.Context, key string) (snapshots.Info, error) {
+	fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ overlay")
 	ctx, t, err := o.ms.TransactionContext(ctx, false)
 	if err != nil {
 		return snapshots.Info{}, err
@@ -207,6 +208,7 @@ func (o *snapshotter) Mounts(ctx context.Context, key string) ([]mount.Mount, er
 }
 
 func (o *snapshotter) Commit(ctx context.Context, name, key string, opts ...snapshots.Opt) error {
+	fmt.Println("-------------------------- Commit")
 	ctx, t, err := o.ms.TransactionContext(ctx, true)
 	if err != nil {
 		return err
@@ -420,6 +422,7 @@ func (o *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
 	td = ""
 
 	rollback = false
+	// t is a Transactor
 	if err = t.Commit(); err != nil {
 		return nil, errors.Wrap(err, "commit failed")
 	}
